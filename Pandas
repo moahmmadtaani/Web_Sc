@@ -1,0 +1,96 @@
+import piplite
+await piplite.install(['seaborn', 'lxml', 'openpyxl'])
+
+import pandas as pd
+###########################################################
+
+from pyodide.http import pyfetch
+
+filename = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0101EN-SkillsNetwork/labs/Module%205/data/addresses.csv"
+
+async def download(url, filename):
+    response = await pyfetch(url)
+    if response.status == 200:
+        with open(filename, "wb") as f:
+            f.write(await response.bytes())
+
+await download(filename, "addresses.csv")
+
+df = pd.read_csv("addresses.csv", header=None)
+
+df.columns =['First Name', 'Last Name', 'Location ', 'City','State','Area Code']
+df["First Name"]
+
+df = df[['First Name', 'Last Name', 'Location ', 'City','State','Area Code']]
+df
+
+df.loc[[0,1,2], "First Name" ]
+df.loc[0]
+
+#transform function
+df=pd.DataFrame(np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]]), columns=['a', 'b', 'c'])
+
+df = df.transform(func = lambda x : x + 10)
+
+result = df.transform(func = ['sqrt'])
+
+s = pd.Series(range(3))
+s.transform([np.sqrt, np.exp])
+
+
+df = pd.DataFrame({
+    "Date": [
+        "2015-05-08", "2015-05-07", "2015-05-06", "2015-05-05",
+        "2015-05-08", "2015-05-07", "2015-05-06", "2015-05-05"],
+    "Data": [5, 8, 6, 1, 50, 100, 60, 120],
+})
+
+df.groupby('Date')['Data'].transform('sum')
+
+df = pd.DataFrame({
+    "c": [1, 1, 1, 2, 2, 2, 2],
+    "type": ["m", "n", "o", "m", "m", "n", "n"]
+})
+
+df['size'] = df.groupby('c')['type'].transform(len)
+df
+
+####################################################
+filename = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-PY0101EN-SkillsNetwork/labs/Module%205/data/diabetes.csv"
+
+async def download(url, filename):
+    response = await pyfetch(url)
+    if response.status == 200:
+        with open(filename, "wb") as f:
+            f.write(await response.bytes())
+
+await download(filename, "diabetes.csv")
+df = pd.read_csv("diabetes.csv")
+
+print("The first 5 rows of the dataframe") 
+df.head(5)
+
+df.shape
+
+df.info()
+
+df.describe()
+
+missing_data = df.isnull()
+missing_data.head(5)
+
+for column in missing_data.columns.values.tolist():
+    print(column)
+    print (missing_data[column].value_counts())
+    print("")    
+ #there is no missing values in the dataset.
+
+
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+labels= 'Not Diabetic','Diabetic'
+plt.pie(df['Outcome'].value_counts(),labels=labels,autopct='%0.02f%%')
+plt.legend()
+plt.show()
+
